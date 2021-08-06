@@ -1,16 +1,18 @@
-# This is a sample Python script.
+import firebase_admin
+from fb_info import cred_path
+from firebase_admin import credentials
+from firebase_admin import firestore
 
-# Press Ctrl+F5 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+cred = credentials.Certificate(cred_path)
+firebase_admin.initialize_app(cred, {"projectId": "groovle-app"})
 
+dbClient = firestore.client()
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press F9 to toggle the breakpoint.
+# doc_ref = db.collection(u"users").document("user02")
+# doc_ref.set({u"level": 23, u"money": 701, u"job": "Mage"})
 
+roomDocumentId = "aCs00NPMrnmtJjasluHC"
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+users_ref = dbClient.document(u"rooms", roomDocumentId)
+doc = users_ref.get()
+print(doc.to_dict())
