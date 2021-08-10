@@ -1,55 +1,23 @@
-import firebase_admin
-from fb_info import cred_path
-from pb_info import config
-from firebase_admin import credentials
-from firebase_admin import firestore
-import pyrebase
+import sys
+from connector import GroovleConnector
 
 
-class GroovleConnector:
+class Groovle:
     def __init__(self):
-        self.dbClient = None
-        self.storageClient = None
-        self.roomDocumentId = "qR4F9iAMdqyQQqPZSHhI"
-        self.roomObj = None
-        self.audioSourceIds = []
-        self.audioSources = []
+        self.connector = GroovleConnector()
+        self.roomDocumentId = ""
 
-    def getClient(self):
-        cred = credentials.Certificate(cred_path)
-        firebase_admin.initialize_app(cred, {"projectId": "groovle-app"})
-        self.dbClient = firestore.client()
+    def getRoomDocumentId(self):
+        self.roomDocumentId = sys.argv[1]
+        print(self.roomDocumentId)
 
-        firebaseApp = pyrebase.initialize_app(config)
-        self.storageClient = firebaseApp.storage()
+    def connect(self):
+        self.connector.getClient()
+        self.connector.getAudioSourceIds(self.roomDocumentId)
+        self.connector.getAudioSources()
+        self.connector.readAudioSources()
+        print("connected!!!")
 
-    def getAudioSourceIds(self):
-        rooms_ref = self.dbClient.document("rooms", self.roomDocumentId)
-        self.roomObj = rooms_ref.get().to_dict()
-        self.audioSourceIds = self.roomObj["audioSourceIds"]
-
-    def getAudioSources(self):
-        for audioSourceId in self.audioSourceIds:
-            audioSource_ref = self.dbClient.document("audioSources", audioSourceId)
-            audioSource = audioSource_ref.get().to_dict()
-            self.audioSources.append(audioSource)
-        print(self.audioSources)
-
-    def readAudioSources(self):
-        for audioSource in self.audioSources:
-            self.storageClient.child().download(
-                audioSource["creatorId"] + "/" + audioSource["audioSourceStorageName"],
-                "download/"
-                + audioSource["belongingRoomSongName"]
-                + audioSource["sessionName"]
-                + "."
-                + audioSource["extension"],
-            )
-
-
-if __name__ == "__main__":
-    groovle = GroovleConnector()
-    groovle.getClient()
-    groovle.getAudioSourceIds()
-    groovle.getAudioSources()
-    groovle.readAudioSources()
+groovle = Groovle()
+groovle.getRoomDocumentId()
+groovle.connect()
