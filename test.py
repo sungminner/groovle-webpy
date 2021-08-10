@@ -1,5 +1,7 @@
-import sys
+import os
 
-print('#Hello from python#')
-print('0 param:'+sys.argv[0]+'#')
-print('First param:'+sys.argv[1]+'#')
+
+if not os.path.isdir("hi"):
+    os.mkdir("hi")
+else:
+    print("already exists!")

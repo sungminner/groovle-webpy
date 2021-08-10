@@ -4,6 +4,7 @@ from pb_info import config
 from firebase_admin import credentials
 from firebase_admin import firestore
 import pyrebase
+import os
 
 
 class GroovleConnector:
@@ -34,7 +35,15 @@ class GroovleConnector:
             self.audioSources.append(audioSource)
         print(self.audioSources)
 
-    def readAudioSources(self):
+    def downloadAudioSources(self):
+        os.makedirs(
+            "audio/" + self.audioSources[0]["belongingRoomId"] + "/download",
+            exist_ok=True,
+        )
+        os.makedirs(
+            "audio/" + self.audioSources[0]["belongingRoomId"] + "/result",
+            exist_ok=True,
+        )
         for audioSource in self.audioSources:
             self.storageClient.child().download(
                 audioSource["creatorId"]
@@ -42,7 +51,9 @@ class GroovleConnector:
                 + audioSource["audioSourceStorageName"]
                 + "."
                 + audioSource["extension"],
-                "download/"
+                "audio/"
+                + audioSource["belongingRoomId"]
+                + "/download/"
                 + audioSource["belongingRoomSongName"]
                 + " - "
                 + audioSource["sessionName"]
@@ -52,8 +63,8 @@ class GroovleConnector:
 
 
 if __name__ == "__main__":
-    groovle = GroovleConnector()
-    groovle.getClient()
-    groovle.getAudioSourceIds()
-    groovle.getAudioSources()
-    groovle.readAudioSources()
+    connector = GroovleConnector()
+    connector.getClient()
+    connector.getAudioSourceIds()
+    connector.getAudioSources()
+    connector.downloadAudioSources()
