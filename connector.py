@@ -27,44 +27,20 @@ class GroovleConnector:
         rooms_ref = self.dbClient.document("rooms", roomDocumentId)
         self.roomObj = rooms_ref.get().to_dict()
         self.audioSourceIds = self.roomObj["audioSourceIds"]
+        if not os.path.isdir("audio/" + self.roomObj["roomId"]):
+            os.mkdir("audio/" + self.roomObj["roomId"])
 
     def getAudioSources(self):
         for audioSourceId in self.audioSourceIds:
             audioSource_ref = self.dbClient.document("audioSources", audioSourceId)
             audioSource = audioSource_ref.get().to_dict()
             self.audioSources.append(audioSource)
-        print(self.audioSources)
-
-    def downloadAudioSources(self):
-        os.makedirs(
-            "audio/" + self.audioSources[0]["belongingRoomId"] + "/download",
-            exist_ok=True,
-        )
-        os.makedirs(
-            "audio/" + self.audioSources[0]["belongingRoomId"] + "/result",
-            exist_ok=True,
-        )
-        for audioSource in self.audioSources:
-            self.storageClient.child().download(
-                audioSource["creatorId"]
-                + "/"
-                + audioSource["audioSourceStorageName"]
-                + "."
-                + audioSource["extension"],
-                "audio/"
-                + audioSource["belongingRoomId"]
-                + "/download/"
-                + audioSource["belongingRoomSongName"]
-                + " - "
-                + audioSource["sessionName"]
-                + "."
-                + audioSource["extension"],
-            )
+        # print(self.audioSources)
 
 
 if __name__ == "__main__":
+    roomDocumentId = "qR4F9iAMdqyQQqPZSHhI"
     connector = GroovleConnector()
     connector.getClient()
-    connector.getAudioSourceIds()
+    connector.getAudioSourceIds(roomDocumentId)
     connector.getAudioSources()
-    connector.downloadAudioSources()
