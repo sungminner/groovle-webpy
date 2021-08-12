@@ -11,6 +11,7 @@ class GroovleConnector:
     def __init__(self):
         self.dbClient = None
         self.storageClient = None
+        self.audioSource = None
         self.roomObj = None
         self.audioSourceIds = []
         self.audioSources = []
@@ -22,6 +23,11 @@ class GroovleConnector:
 
         firebaseApp = pyrebase.initialize_app(config)
         self.storageClient = firebaseApp.storage()
+
+    def getOneAudioSource(self, audioSourceId):
+        audioSources_ref = self.dbClient.document("audioSources", audioSourceId)
+        self.audioSource = audioSources_ref.get().to_dict()
+        print(self.audioSource)
 
     def getAudioSourceIds(self, roomDocumentId):
         rooms_ref = self.dbClient.document("rooms", roomDocumentId)
@@ -35,7 +41,6 @@ class GroovleConnector:
             audioSource_ref = self.dbClient.document("audioSources", audioSourceId)
             audioSource = audioSource_ref.get().to_dict()
             self.audioSources.append(audioSource)
-        # print(self.audioSources)
 
 
 if __name__ == "__main__":

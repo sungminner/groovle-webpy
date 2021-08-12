@@ -5,18 +5,27 @@ from synthesizer import GroovleSynthesizer
 
 class Groovle:
     def __init__(self):
-        self.roomDocumentId = sys.argv[1]
         self.audioSources = []
         self.connector = GroovleConnector()
         self.synthesizer = GroovleSynthesizer()
-        print(self.roomDocumentId)
 
-    def connect(self):
+    # 편집
+    def audioConnect(self):
         self.connector.getClient()
-        self.connector.getAudioSourceIds(self.roomDocumentId)
+        self.connector.getOneAudioSource(sys.argv[2])
+        self.audioSource = self.connector.audioSource
+        print("edit connected!!!")
+
+    def edit(self):
+        pass
+
+    # 합성
+    def roomConnect(self):
+        self.connector.getClient()
+        self.connector.getAudioSourceIds(sys.argv[2])
         self.connector.getAudioSources()
         self.audioSources = self.connector.audioSources
-        print("connected!!!")
+        print("synthesize connected!!!")
 
     def synthesize(self):
         self.synthesizer.setAudioSources(self.audioSources)
@@ -25,5 +34,9 @@ class Groovle:
 
 
 groovle = Groovle()
-groovle.connect()
-groovle.synthesize()
+if sys.argv[1] == "edit":
+    groovle.audioConnect()
+    # groovle.edit()
+elif sys.argv[1] == "synthesize":
+    groovle.roomConnect()
+    groovle.synthesize()
